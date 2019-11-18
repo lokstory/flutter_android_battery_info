@@ -19,7 +19,7 @@ import android.widget.Toast
 
 class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
     private lateinit var context: Context
-    private var temperature: Int? = null
+    private var temperature: Double? = null
     private val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
     private val powerProfileClass = "com.android.internal.os.PowerProfile"
 
@@ -65,7 +65,7 @@ class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
             return
         }
 
-        temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0)
+        temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0).toDouble() / 10
     }
 
     private fun init(registrar: Registrar) {
@@ -110,7 +110,7 @@ class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
 
             val capacity = Class
                     .forName(powerProfileClass)
-                    .getMethod("getBatteryCapacity", java.lang.String::class.java)
+                    .getMethod("getBatteryCapacity")
                     .invoke(profile) as Double
 
             result.success(capacity.toInt())

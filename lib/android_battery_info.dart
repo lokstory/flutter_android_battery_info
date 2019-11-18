@@ -27,7 +27,7 @@ class AndroidBatteryInfo {
   }
 
   /// Get battery temperature
-  static Future<int> get temperature async {
+  static Future<double> get temperature async {
     return await _channel.invokeMethod('getTemperature');
   }
 

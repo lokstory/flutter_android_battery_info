@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+/// Android battery info provides capacity and temperature
 class AndroidBatteryInfo {
   static const MethodChannel _channel =
       const MethodChannel('android_battery_info');
 
+// TODO: Steam to notify
 //  int _temperature = null;
 //  Stream<int> temperature = Stream.fromFuture(future);
 
@@ -19,17 +21,17 @@ class AndroidBatteryInfo {
     await _channel.invokeMethod('startListenTemperature');
   }
 
-  /// cancel listening battery temperature
+  /// Cancel listening battery temperature
   static Future<void> stopListenTemperature() async {
     await _channel.invokeMethod('stopListenTemperature');
   }
 
   /// Get battery temperature
-  Future<String> get temperature async {
+  static Future<String> get temperature async {
     return await _channel.invokeMethod('getTemperature');
   }
 
-  /// Get battery temperature
+  /// Get battery capacity
   static Future<int> get capacity async {
     return await _channel.invokeMethod('getCapacity');
   }

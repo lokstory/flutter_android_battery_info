@@ -2,16 +2,16 @@ package moon.dream.android_battery_info
 
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.BATTERY_SERVICE
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.Build
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import android.content.Context.BATTERY_SERVICE
-import android.os.Build
-import android.content.Intent
-import android.content.IntentFilter
 
 class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
     lateinit var context: Context
@@ -65,7 +65,7 @@ class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
     }
 
     private fun startListenTemperature(result: Result) {
-        context.registerReceiver(this ,filter)
+        context.registerReceiver(this, filter)
         result.success(null)
     }
 
@@ -81,8 +81,17 @@ class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
         }
 
         val batteryManager = context.getSystemService(BATTERY_SERVICE) as BatteryManager
+        val chargeCounter = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
         val capacity = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        result.success(capacity)
+
+        if (capacity <= 0) {
+            result.success(null)
+            return
+        }
+
+        val value = (chargeCounter.toDouble() / capacity.toDouble()) * 100
+
+        result.success(value.toInt())
     }
 
     private fun getTemperature(result: Result) {

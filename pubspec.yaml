@@ -1,8 +1,8 @@
 name: android_battery_info
-description: Android battery info
-version: 0.0.1
+description: Get android battery capacity and temperature
+version: 0.0.2
 author: Lucas Jiang <lokstory@gmail.com>
-homepage: https://github.com/lokstory
+homepage: https://github.com/lokstory/flutter_android_battery_info
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

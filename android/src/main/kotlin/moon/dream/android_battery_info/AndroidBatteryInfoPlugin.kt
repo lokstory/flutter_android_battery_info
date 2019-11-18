@@ -25,7 +25,7 @@ class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
             plugin.init(registrar)
 
             val channel = MethodChannel(registrar.messenger(), "android_battery_info")
-            channel.setMethodCallHandler(AndroidBatteryInfoPlugin())
+            channel.setMethodCallHandler(plugin)
         }
     }
 

@@ -1,5 +1,6 @@
 package moon.dream.android_battery_info
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.BATTERY_SERVICE
@@ -12,11 +13,15 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import android.widget.Toast
+
+
 
 class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
-    lateinit var context: Context
-    var filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+    private lateinit var context: Context
     private var temperature: Int? = null
+    private val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+    private val powerProfileClass = "com.android.internal.os.PowerProfile"
 
     companion object {
         @JvmStatic
@@ -45,6 +50,9 @@ class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
             }
             "getCapacity" -> {
                 getCapacity(result)
+            }
+            "getCapacityByReflection" -> {
+                getCapacityByReflection(result)
             }
             else -> {
                 result.notImplemented()
@@ -89,9 +97,27 @@ class AndroidBatteryInfoPlugin : MethodCallHandler, BroadcastReceiver() {
             return
         }
 
-        val value = (chargeCounter.toDouble() / capacity.toDouble()) * 100
+        val value = (chargeCounter.toDouble() / capacity.toDouble()) * 100 / 1000
 
         result.success(value.toInt())
+    }
+
+    @SuppressLint("PrivateApi")
+    private fun getCapacityByReflection(result: Result) {
+        try {
+            val profile = Class.forName(powerProfileClass)
+                    .getConstructor(Context::class.java).newInstance(context)
+
+            val capacity = Class
+                    .forName(powerProfileClass)
+                    .getMethod("getBatteryCapacity", java.lang.String::class.java)
+                    .invoke(profile) as Double
+
+            result.success(capacity.toInt())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            result.success(null)
+        }
     }
 
     private fun getTemperature(result: Result) {

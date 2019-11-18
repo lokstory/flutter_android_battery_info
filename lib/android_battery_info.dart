@@ -27,12 +27,17 @@ class AndroidBatteryInfo {
   }
 
   /// Get battery temperature
-  static Future<String> get temperature async {
+  static Future<int> get temperature async {
     return await _channel.invokeMethod('getTemperature');
   }
 
-  /// Get battery capacity
+  /// Get battery capacity (mAh)
   static Future<int> get capacity async {
     return await _channel.invokeMethod('getCapacity');
+  }
+
+  /// Get battery capacity by reflection (mAh)
+  static Future<int> get capacityByReflection async {
+    return await _channel.invokeMethod('getCapacityByReflection');
   }
 }
